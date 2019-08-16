@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/Scenes/Body and RGB.unity
+  isLoaded: 1
+  isActive: 1
