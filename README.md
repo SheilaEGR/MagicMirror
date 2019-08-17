@@ -25,12 +25,12 @@ There is a set of sample scenes to help you get familiar with the scripts provid
 
 #### 1.1 Simple RGB scene
 
-This is [the simples scene](Scenes/SimpleRGB.md) we can build. A cube with aspect ratio of 16:9 displays the color frames acquired by the Kinecv v2 sensor.
+This is [the simples scene](Documentation/SimpleRGB.md) we can build. A cube with aspect ratio of 16:9 displays the color frames acquired by the Kinecv v2 sensor.
 
 #### 1.2 Simple Body scene
 
-In [this scene](Scenes/SimpleBody.md), the sensor detects and tracks one body, then it displays every body joint position and orientation using a box as marker.
+In [this scene](Documentation/SimpleBody.md), the sensor detects and tracks one body, then it displays every body joint position and orientation using a box as marker.
 
 #### 1.3 Body and RGB scene
 
-In [this scene](Scenes/BodyAndRGB.md), the sensor acquires both RGB frames and body information, and displays all that information superimposed. This is the first step towards __Augmented Reality__.
+In [this scene](Documentation/BodyAndRGB.md), the sensor acquires both RGB frames and body information, and displays all that information superimposed. This is the first step towards __Augmented Reality__.
