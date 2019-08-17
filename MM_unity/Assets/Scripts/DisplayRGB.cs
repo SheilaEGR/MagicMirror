@@ -17,7 +17,7 @@ using UnityEngine;
  */
 public class DisplayRGB : MonoBehaviour
 {
-    public GameObject sensorRGB;        /*!< Game object containing SensorRGB script. */
+    public GameObject sensorRGB;        /*!< Game object containing a  SensorRGB script. */
     private SensorRGB colorCamera;
 
     void Start()

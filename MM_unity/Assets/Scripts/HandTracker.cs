@@ -12,12 +12,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Kinect = Windows.Kinect;
 
+
+/** Brief Attach this class to the body controller. This is useful for projects that include a hand tracker.
+ * 
+ * This script is part of the "Simple hand tracking" scene.
+ */
 public class HandTracker : MonoBehaviour
 {
-    public GameObject bodySensor;
-    public GameObject marker;
-    public bool trackRightHand = true;
-    public bool trackLeftHand = false;
+    public GameObject bodySensor;           /*!< Reference to body sensor. */
+    public GameObject marker;               /*!< Reference to the solid used as marker (a box for instance). */
+    public bool trackRightHand = true;      /*!< True if tracking right hand. */
+    public bool trackLeftHand = false;      /*!< True if tracking left hand. */
 
     private Dictionary<ulong, GameObject> bodyDict = new Dictionary<ulong, GameObject>();
     private SensorBody bodyReader;

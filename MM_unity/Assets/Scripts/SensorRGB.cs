@@ -28,6 +28,14 @@ public class SensorRGB : MonoBehaviour
     private Texture2D _Texture;
     private byte[] _Data;
 
+    /*!
+     * \brief Get a texture containing the last frame acquired by the Kinect v2 RGB sensor.
+     * 
+     * Apply this texture to a solid body, for example, a cube. The size of two of the faces of the cube
+     * should have the aspect ratio of 16:9, the same aspect ratio of the Kinect v2 sensor.
+     * 
+     * \return Texture containing the last frame acquired by the sensor.
+     */
     public Texture2D GetColorTexture()
     {
         return _Texture;

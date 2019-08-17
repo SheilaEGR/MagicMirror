@@ -45,7 +45,7 @@ public class SensorBody : MonoBehaviour
         return _Mapper;
     }
 
-    /*! \brief Compute the height of the currently tracked body in 3D space, for scaling purposes
+    /*! \brief Compute the height of the currently tracked body in 3D space, for scaling purposes.
      Methodology obtained from https://pterneas.com/kinect/
 
      \param body Reference to a body detected and tracked by the kinect sensor.

@@ -13,15 +13,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Kinect = Windows.Kinect;
 
-/** Display the body joins as boxes or any given marker (sphere, capsle, etc.).
+/*! Brief Display the body joints as boxes or any given marker (sphere, capsule, etc.).
  * 
  * This script is part of the "Simple Body" scene.
  */
 public class BoxSkeleton : MonoBehaviour
 {
-    public GameObject BodySourceManager;    /*!< Reference to SensorBody */
-    public GameObject Marker;
-    public float scale = 1.0f;
+    public GameObject BodySourceManager;    /*!< Reference to SensorBody. */
+    public GameObject Marker;               /*!< Reference to the solid used as marker (a box for instance). */
+    public float scale = 1.0f;              /*!< The scale at which the marker will be drawn on each body joint. */
 
     private Dictionary<ulong, GameObject> bodyDict = new Dictionary<ulong, GameObject>();
     private SensorBody bodyReader;
@@ -102,6 +102,7 @@ public class BoxSkeleton : MonoBehaviour
         int i = 0;
         foreach(Transform child in bodyObject.transform)
         {
+            // If the current body joint is being tracked (infinity), ignore
             if ((bodyJoints[i].x == Mathf.Infinity || bodyJoints[i].x == Mathf.NegativeInfinity) ||
                 (bodyJoints[i].y == Mathf.Infinity || bodyJoints[i].y == Mathf.NegativeInfinity))
             {
@@ -110,6 +111,7 @@ public class BoxSkeleton : MonoBehaviour
                 continue;
             }
 
+            // Place the current body joint on the desired location
             child.transform.position = bodyJoints[i] * scale;
             child.transform.localRotation = bodyOrientation[i];
 
