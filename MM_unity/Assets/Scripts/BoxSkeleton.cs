@@ -75,6 +75,7 @@ public class BoxSkeleton : MonoBehaviour
         }
     }
 
+    // Create a new game object containing a marker for every joint as children
     private GameObject CreateBody(ulong id)
     {
         GameObject body = new GameObject();
@@ -94,15 +95,17 @@ public class BoxSkeleton : MonoBehaviour
 
     private void RefreshBodyObject(Kinect.Body body, GameObject bodyObject)
     {
+        BodyAnalysis.SetMapper(bodyReader.GetMapper());
+
         // Get position and rotation of every body joint. 
         // Position will be computed as 2D vector for displaying purposes
-        Vector3[] bodyJoints = bodyReader.convertToUnityPosition(body.Joints);
-        Quaternion[] bodyOrientation = bodyReader.convertToUnityOrientation(body.JointOrientations);
+        Vector3[] bodyJoints = BodyAnalysis.convertToUnityPosition(body.Joints);
+        Quaternion[] bodyOrientation = BodyAnalysis.convertToUnityOrientation(body.JointOrientations);
 
         int i = 0;
         foreach(Transform child in bodyObject.transform)
         {
-            // If the current body joint is being tracked (infinity), ignore
+            // If the current body joint is not being tracked (infinity), ignore
             if ((bodyJoints[i].x == Mathf.Infinity || bodyJoints[i].x == Mathf.NegativeInfinity) ||
                 (bodyJoints[i].y == Mathf.Infinity || bodyJoints[i].y == Mathf.NegativeInfinity))
             {
