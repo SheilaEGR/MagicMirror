@@ -8,19 +8,14 @@
 *  Dr. Sheila Esmeralda Gonzalez Reyna  (sheila.esmeralda.gonzalez@gmail.com)
 ************************************************************************************* */
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Windows.Kinect;
 
-public class BodyAnalysis : MonoBehaviour
+public class BodyAnalysis 
 {
     private static CoordinateMapper _Mapper;       // Maps from body to color space
-
-    public static void SetMapper(CoordinateMapper mapper)
-    {
-        _Mapper = mapper;
-    }
+    
 
     // ===============================================================================================
     // ==========                            3D ANALYSIS                                    ==========
@@ -62,7 +57,7 @@ public class BodyAnalysis : MonoBehaviour
     }
 
 
-    /*! Convert Kinect's 3D position to Unity's Vector3
+    /*! \brief Convert Kinect's 3D position to Unity's Vector3
      Kinect reads and stores body joints using its own "Joint" structure. For displaying and further analysis purposes, 
      we need to convert to Unity's Vector3 structure.
      
@@ -83,7 +78,7 @@ public class BodyAnalysis : MonoBehaviour
     }
 
 
-    /*! Convert Kinect's orientation to Unity's Quaternion 
+    /*! \brief Convert Kinect's orientation to Unity's Quaternion 
      Kinect has its own Quaternion representation for body joint's orientation.
      This function converts that representation to Unity's Quaternion for further analysis.
 
@@ -104,6 +99,12 @@ public class BodyAnalysis : MonoBehaviour
     }
 
 
+    /*! \brief Compute arm length in 3D space.
+     * 
+     * \param body Reference to a body detected and tracked by the kinect sensor.
+     * \param rightArm True for right arm, False for left arm.
+     * \return Arm length in 3D space.
+     */
     public static float ComputeArmLength(Body body, bool rightArm)
     {
         float length = 0;
@@ -125,6 +126,13 @@ public class BodyAnalysis : MonoBehaviour
         return length;
     }
 
+
+    /*! \brief Compute leg length in 3D scene.
+     * 
+     * \param body Reference to a body detected and tracked by the kinect sensor.
+     * \param rightLeg True for right leg, False for left leg.
+     * \return Leg length in 3D space.
+     */
     public static float ComputeLegLength(Body body, bool rightLeg)
     {
         float length = 0;
@@ -147,11 +155,206 @@ public class BodyAnalysis : MonoBehaviour
     }
 
 
+    /*! \brief Angle of the spine in flexion movement.
+     * 
+     * \param body Reference to a body detected and tracked by the kinect sensor.
+     * \param coronalPlane true for coronal plane, false for sagital plane.
+     * \return Angle of spine in flexion movement.
+     */
+    public static float FlexionSpineAngle(Body body, bool coronalPlane)
+    {
+        UnityEngine.Vector3[] jointPos = convertToUnityPosition(body.Joints);
+
+        UnityEngine.Vector3 spineVec = jointPos[(int)JointType.SpineBase] - jointPos[(int)JointType.SpineShoulder];
+        UnityEngine.Vector2 spineVec2D;
+        if (coronalPlane)
+        {
+            spineVec2D = new UnityEngine.Vector2(spineVec.x, spineVec.y);
+        }
+        else
+        {
+            spineVec2D = new UnityEngine.Vector2(spineVec.z, spineVec.y);
+        }
+
+        return UnityEngine.Vector2.Angle(UnityEngine.Vector2.up, spineVec2D);
+    }
+
+
+    /*! \brief Angle of the shoulder in abduction movement.
+     * 
+     * \param Reference to a body detected and tracked by the kinect sensor.
+     * \param rightArm true for right arm, false for left arm.
+     * \return Angle of shoulder in abduction movement.
+     */
+    public static float AbductionShoulderAngle(Body body, bool rightArm)
+    {
+        UnityEngine.Vector3[] jointPos = convertToUnityPosition(body.Joints);
+
+        UnityEngine.Vector3 spineVec = jointPos[(int)JointType.SpineBase] - jointPos[(int)JointType.SpineShoulder];
+        UnityEngine.Vector3 armVec;
+        if (rightArm)
+        {
+            armVec = jointPos[(int)JointType.ShoulderRight] - jointPos[(int)JointType.ElbowRight];
+        }
+        else
+        {
+            armVec = jointPos[(int)JointType.ShoulderLeft] - jointPos[(int)JointType.ElbowLeft];
+        }
+
+        UnityEngine.Vector2 spineVec2D = new UnityEngine.Vector2(spineVec.x, spineVec.y);
+        UnityEngine.Vector2 armVec2D = new UnityEngine.Vector2(armVec.x, armVec.y);
+
+        return UnityEngine.Vector2.Angle(spineVec2D, armVec2D);
+    }
+
+
+    /*! \brief Angle of the leg in abduction movement (taking hip as rotation pivot).
+     * 
+     * \param body Reference to a body detected and tracked by the kinect sensor.
+     * \param rightLeg true for right leg, false for left leg.
+     * \return Angle of leg in abduction movement.
+     */
+    public static float AbductionLegAngle(Body body, bool rightLeg)
+    {
+        UnityEngine.Vector3[] jointPos = convertToUnityPosition(body.Joints);
+
+        UnityEngine.Vector3 spineVec = jointPos[(int)JointType.SpineBase] - jointPos[(int)JointType.SpineShoulder];
+        UnityEngine.Vector3 legVec;
+        if (rightLeg)
+        {
+            legVec = jointPos[(int)JointType.ShoulderRight] - jointPos[(int)JointType.ElbowRight];
+        }
+        else
+        {
+            legVec = jointPos[(int)JointType.ShoulderLeft] - jointPos[(int)JointType.ElbowLeft];
+        }
+
+        UnityEngine.Vector2 spineVec2D = new UnityEngine.Vector2(spineVec.x, spineVec.y);
+        UnityEngine.Vector2 legVec2D = new UnityEngine.Vector2(legVec.x, legVec.y);
+
+        return UnityEngine.Vector2.Angle(spineVec2D, legVec2D);
+    }
+
+
+    /*! \brief Angle of shoulder in Flexion movement.
+     * 
+     * \param body Reference to a body detected and tracked by the kinect sensor.
+     * \param rightArm true for right arm, false for left arm.
+     * \return Angle of shoulder in flexion movement.
+     */
+    public static float FlexionShoulderAngle(Body body, bool rightArm)
+    {
+        UnityEngine.Vector3[] jointPos = convertToUnityPosition(body.Joints);
+ 
+        UnityEngine.Vector3 armVec;
+        if (rightArm)
+        {
+            armVec = jointPos[(int)JointType.ShoulderRight] - jointPos[(int)JointType.ElbowRight];
+        }
+        else
+        {
+            armVec = jointPos[(int)JointType.ShoulderLeft] - jointPos[(int)JointType.ElbowLeft];
+        }
+
+        UnityEngine.Vector2 armVec2D = new UnityEngine.Vector2(armVec.z, armVec.y);
+
+        return UnityEngine.Vector2.Angle(UnityEngine.Vector2.down, armVec2D);
+    }
+
+
+    /*! \brief Angle of elbow in flexion movement.
+     * 
+     * \param body Reference to a body detected and tracked by the kinect sensor.
+     * \param rightArm true for right arm, false for left arm.
+     * \return angle of elbow in flexion movement.
+     */
+    public static float FlexionElbowAngle(Body body, bool rightArm)
+    {
+        UnityEngine.Vector3[] jointPos = convertToUnityPosition(body.Joints);
+
+        UnityEngine.Vector3 shoulderElbow, elbowWrist;
+        if(rightArm)
+        {
+            shoulderElbow = jointPos[(int)JointType.ShoulderRight] - jointPos[(int)JointType.ElbowRight];
+            elbowWrist = jointPos[(int)JointType.ElbowRight] - jointPos[(int)JointType.WristRight];
+        } else
+        {
+            shoulderElbow = jointPos[(int)JointType.ShoulderLeft] - jointPos[(int)JointType.ElbowLeft];
+            elbowWrist = jointPos[(int)JointType.ElbowLeft] - jointPos[(int)JointType.WristLeft];
+        }
+
+        float argument = UnityEngine.Vector3.Dot(shoulderElbow, elbowWrist) / (UnityEngine.Vector3.Magnitude(shoulderElbow) * UnityEngine.Vector3.Magnitude(elbowWrist));
+        return Mathf.Acos(argument);
+    }
+
+
+    /*! \brief Angle of leg in Flexion movement.
+     * 
+     * \param body Reference to a body detected and tracked by the kinect sensor.
+     * \param rightLeg true for right leg, false for left leg.
+     * \return Angle of leg in flexion movement.
+     */
+    public static float FlexionLegAngle(Body body, bool rightLeg)
+    {
+        UnityEngine.Vector3[] jointPos = convertToUnityPosition(body.Joints);
+
+        UnityEngine.Vector3 legVec;
+        if (rightLeg)
+        {
+            legVec = jointPos[(int)JointType.HipRight] - jointPos[(int)JointType.KneeRight];
+        }
+        else
+        {
+            legVec = jointPos[(int)JointType.HipLeft] - jointPos[(int)JointType.KneeLeft];
+        }
+
+        UnityEngine.Vector2 legVec2D = new UnityEngine.Vector2(legVec.z, legVec.y);
+
+        return UnityEngine.Vector2.Angle(UnityEngine.Vector2.down, legVec);
+    }
+
+
+    /*! \brief Angle of knee in flexion movement.
+     * 
+     * \param body Reference to a body detected and tracked by the kinect sensor.
+     * \param rightLeg true for right leg, false for left leg.
+     * \return Angle of knee in flexion movement.
+     */
+    public static float FlexionKneeAngle(Body body, bool rightLeg)
+    {
+        UnityEngine.Vector3[] jointPos = convertToUnityPosition(body.Joints);
+
+        UnityEngine.Vector3 hipKnee, kneeAnkle;
+        if (rightLeg)
+        {
+            hipKnee = jointPos[(int)JointType.HipRight] - jointPos[(int)JointType.KneeRight];
+            kneeAnkle = jointPos[(int)JointType.KneeRight] - jointPos[(int)JointType.AnkleRight];
+        }
+        else
+        {
+            hipKnee = jointPos[(int)JointType.HipLeft] - jointPos[(int)JointType.KneeLeft];
+            kneeAnkle = jointPos[(int)JointType.KneeLeft] - jointPos[(int)JointType.AnkleLeft];
+        }
+
+        float argument = UnityEngine.Vector3.Dot(hipKnee, kneeAnkle) / (UnityEngine.Vector3.Magnitude(hipKnee) * UnityEngine.Vector3.Magnitude(kneeAnkle));
+        return Mathf.Acos(argument);
+    }
 
 
     // ===============================================================================================
     // ==========                            2D ANALYSIS                                    ==========
     // ===============================================================================================
+
+
+    /*! \brief Set Kinect's CoordinateMapper for conversion from 3D to screen coordinates.
+     * 
+     * \param mapper Reference to a CoordinateMapper.
+     */
+    public static void SetMapper(CoordinateMapper mapper)
+    {
+        _Mapper = mapper;
+    }
+
 
     /*! \brief Compute the height of the currently tracked body in 2D space, for scaling purposes
      Methodology obtained from https://pterneas.com/kinect/
@@ -180,21 +383,17 @@ public class BodyAnalysis : MonoBehaviour
         if (body.Joints[JointType.AnkleRight].TrackingState == TrackingState.Tracked) trackedJointsRight++;
         if (body.Joints[JointType.FootRight].TrackingState == TrackingState.Tracked) trackedJointsRight++;
 
-        float dHip2Knee, dKnee2Ankle, dAnkle2Foot;
+        float legLength;
         if (trackedJointsLeft > trackedJointsRight)
         {
-            dHip2Knee = UnityEngine.Vector2.Distance(jointPos[(int)JointType.HipLeft], jointPos[(int)JointType.KneeLeft]);
-            dKnee2Ankle = UnityEngine.Vector2.Distance(jointPos[(int)JointType.KneeLeft], jointPos[(int)JointType.AnkleLeft]);
-            dAnkle2Foot = UnityEngine.Vector2.Distance(jointPos[(int)JointType.AnkleLeft], jointPos[(int)JointType.FootLeft]);
+            legLength = ComputeLegLength2D(body, scale, position, false);
         }
         else
         {
-            dHip2Knee = UnityEngine.Vector2.Distance(jointPos[(int)JointType.HipRight], jointPos[(int)JointType.KneeRight]);
-            dKnee2Ankle = UnityEngine.Vector2.Distance(jointPos[(int)JointType.KneeRight], jointPos[(int)JointType.AnkleRight]);
-            dAnkle2Foot = UnityEngine.Vector2.Distance(jointPos[(int)JointType.AnkleRight], jointPos[(int)JointType.FootRight]);
+            legLength = ComputeLegLength2D(body, scale, position, true);
         }
 
-        return (dHead2Neck + dNeck2SpineShoulder + dSpine + dHip2Knee + dKnee2Ankle + dAnkle2Foot + 0.08f);
+        return (dHead2Neck + dNeck2SpineShoulder + dSpine + legLength + 0.08f);
     }
 
 
@@ -233,5 +432,61 @@ public class BodyAnalysis : MonoBehaviour
     }
 
 
-    
+    /*! \brief Compute arm length in screen coordinates.
+     * 
+     * \param kinectJoint Position of the body joints in Kinect's Joint structure.
+     * \param scale Size of the screen where the model will be placed.
+     * \param position Position of the screen where the model will be placed.
+     * \param rightArm True for right arm, False for left arm.
+     * \return Arm length in screen coordinates.
+     */
+    public static float ComputeArmLength2D(Body body, UnityEngine.Vector2 scale, UnityEngine.Vector2 position, bool rightArm)
+    {
+        UnityEngine.Vector2[] jointPos = convertToUnity2DPosition(body.Joints, scale, position);
+
+        float length = 0f;
+        if (rightArm)
+        {
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.ShoulderRight], jointPos[(int)JointType.ElbowRight]);
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.ElbowRight], jointPos[(int)JointType.WristRight]);
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.WristRight], jointPos[(int)JointType.HandRight]);
+        } else
+        {
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.ShoulderLeft], jointPos[(int)JointType.ElbowLeft]);
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.ElbowLeft], jointPos[(int)JointType.WristLeft]);
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.WristLeft], jointPos[(int)JointType.HandLeft]);
+        }
+
+        return length;
+    }
+
+
+    /*! \brief Compute leg length in screen coordinates.
+     * 
+     * \param kinectJoint Position of the body joints in Kinect's Joint structure.
+     * \param scale Size of the screen where the model will be placed.
+     * \param position Position of the screen where the model will be placed.
+     * \param rightLeg True for right leg, False for left leg.
+     * \return Leg length in screen coordinates.
+     */
+    public static float ComputeLegLength2D(Body body, UnityEngine.Vector2 scale, UnityEngine.Vector2 position, bool rightLeg)
+    {
+        UnityEngine.Vector2[] jointPos = convertToUnity2DPosition(body.Joints, scale, position);
+
+        float length = 0f;
+        if (rightLeg)
+        {
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.HipRight], jointPos[(int)JointType.KneeRight]);
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.KneeRight], jointPos[(int)JointType.AnkleRight]);
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.AnkleRight], jointPos[(int)JointType.FootRight]);
+        }
+        else
+        {
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.HipLeft], jointPos[(int)JointType.KneeLeft]);
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.KneeLeft], jointPos[(int)JointType.AnkleLeft]);
+            length += UnityEngine.Vector2.Distance(jointPos[(int)JointType.AnkleLeft], jointPos[(int)JointType.FootLeft]);
+        }
+
+        return length;
+    }
 }
