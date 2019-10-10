@@ -8,7 +8,6 @@
 *  Dr. Sheila Esmeralda Gonzalez Reyna  (sheila.esmeralda.gonzalez@gmail.com)
 ************************************************************************************* */
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Kinect = Windows.Kinect;
@@ -95,8 +94,6 @@ public class BoxSkeleton : MonoBehaviour
 
     private void RefreshBodyObject(Kinect.Body body, GameObject bodyObject)
     {
-        BodyAnalysis.SetMapper(bodyReader.GetMapper());
-
         // Get position and rotation of every body joint. 
         // Position will be computed as 2D vector for displaying purposes
         Vector3[] bodyJoints = BodyAnalysis.convertToUnityPosition(body.Joints);

@@ -39,12 +39,12 @@ public class SensorBody : MonoBehaviour
 
     /*!
      \brief Get a mapper to convert between Kinect's 3D and 2D spaces.
+     \return Coordinate mapper to transform between 3D and 2D spaces.
     */
     public CoordinateMapper GetMapper()
     {
         return _Mapper;
     }
-
 
 
     // ---------- PRIVATE METHODS

@@ -73,6 +73,7 @@ public class ViewBodyAngles : MonoBehaviour
                     bodyDict[body.TrackingId] = CreateBody(body.TrackingId);
                 // Perform operations related to body tracking
                 RefreshBodyObject(body, bodyDict[body.TrackingId]);
+                break;  // <----- Track only one body
             }
         }
     }

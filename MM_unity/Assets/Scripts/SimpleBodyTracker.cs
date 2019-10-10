@@ -8,7 +8,6 @@
 *  Dr. Sheila Esmeralda Gonzalez Reyna  (sheila.esmeralda.gonzalez@gmail.com)
 ************************************************************************************* */
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Kinect = Windows.Kinect;
